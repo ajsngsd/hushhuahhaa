@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مدرسة ش. مطلگ حنون - وزارة التربية</title>
+<style>
+body {
+  font-family: "Tahoma";
+  background: #f5fff8;
+  text-align: center;
+  margin: 0;
+  padding: 0 10px 40px 10px;
+}
+header {
+  background: #009688;
+  color: white;
+  padding: 15px;
+  border-radius: 0 0 15px 15px;
+}
+header h1 {margin: 5px 0; font-size: 26px;}
+header h2 {margin: 0; font-size: 18px; font-weight: normal;}
+
+.navbar {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.navbar button {
+  background: #00796b;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.navbar button:hover {background: #00695c;}
+
+.section {
+  display: none;
+  background: #e0f2f1;
+  max-width: 900px;
+  margin: 18px auto;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+textarea {height: 90px;}
+.small {width: 48%; display: inline-block; box-sizing: border-box;}
+.row {display:flex; gap:8px; justify-content: space-between;}
+
+
+#teachersList, #studentsList {
+  margin-top: 12px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: right;
+}
+.card {
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+.card:last-child {border-bottom: none;}
+.card b {font-size: 16px;}
+
+
+.section button, .small-button {
+  background: #00796b;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.small-button {padding:6px 8px; font-size:14px;}
+.small-button.gray {background:#607d74;}
+.search-box {margin:8px 0;}
+
+
+#studentPhotoPreview {max-width:120px; border-radius:6px; display:block; margin:6px 0;}
+
+
+.tag {display:inline-block; background:#c8e6d9; padding:6px 8px; border-radius:12px; margin:4px; font-size:13px;}
+.grade-row {display:flex; gap:8px; margin:6px 0;}
+
+
+@media (max-width:600px){
+  .row {flex-direction:column;}
+  .small {width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>مدرسة ش. مطلگ حنون</h1>
+  <h2>وزارة التربية</h2>
+</header>
+
+<div class="navbar">
+  <button onclick="showSection('teachers')">قائمة المدرسين</button>
+  <button onclick="showSection('management')">🏢 قائمة الإدارة</button>
+  <button onclick="showSection('students')">🎓 بيانات الطلاب</button>
+  <button onclick="showSection('schoolRecords')">📚 سجل بيانات المدرسة</button>
+</div>
+
+<!-- قسم بيانات المدرسين-->
+<!--حسين للبرمجة يوتيوب-->
+<div id="teachers" class="section">
+  <h3>إدارة المدرسين</h3>
+
+  <div style="text-align:left; margin-bottom:8px;">
+    <button class="small-button" onclick="createNewTeacher()">اضافة بيانات مدرس➕</button>
+    <button class="small-button gray" onclick="downloadAllTeachers()">حفظ جميع بيانات المدرسين</button>
+    <button class="small-button" onclick="triggerTeacherImport()">استرجاع بيانات مدرس</button>
+    <button class="small-button" onclick="clearAllTeachers()" style="background:#d32f2f;">🗑 مسح جميع المدرسين</button>
+  </div>
+
+  <div style="background:#dff6f1; padding:10px; border-radius:8px;">
+    
+    <div style="text-align:right;">
+      <label>الاسم الثلاثي للمدرس</label>
+      <input type="text" id="t_name" placeholder="الاسم الثلاثي للمدرس">
+      
+      <div class="row">
+        <div class="small">
+          <label>رقم الهاتف </label>
+          <input type="text" id="t_phone" placeholder="رقم الهاتف">
+        </div>
+        <div class="small">
+          <label>الجنس</label>
+          <select id="t_gender">
+            <option value="">اختر جنس المدرس</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+          </select>
+        </div>
+      </div>
+
+      <label>عنوان منزل المدرس</label>
+      <input type="text" id="t_address" placeholder="العنوان">
+
+      <div class="row">
+        <div class="small">
+          <label>عمر المدرس</label>
+          <input type="number" id="t_age" placeholder="عمر المدرس">
+        </div>
+        <div class="small">
+          <label>المادة الذي يدرسها</label>
+          <input type="text" id="t_subject" placeholder="المادة الذي يدرسها">
+        </div>
+      </div>
+
+      <label>المراحل الذي يدرسها</label>
+      <div class="row" style="align-items:center;">
+        <input type="text" id="t_stage_input" placeholder="المراحل الذي يدرسها" class="small">
+        <button class="small-button" onclick="addTeacherStage()">إضافة مرحلة</button>
+      </div>
+      <div id="t_stages_list" style="margin-top:6px;"></div>
+
+      <label>الراتب الشهري للمدرس</label>
+      <input type="text" id="t_salary" placeholder="الراتب الشهري للمدرس (بالدينار)" oninput="formatSalaryInput(this)" />
+
+      <label>نبذة عن المدرس</label>
+      <textarea id="t_bio" placeholder="اضف ملاحظات عن المدرس"></textarea>
+
+      <div style="text-align:left;">
+        <button class="small-button" onclick="saveTeacher()"> حفظ المدرس</button>
+        <button class="small-button gray" onclick="clearTeacherForm()"> مسح الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="teacherSearch" placeholder=" بحث بالاسم أو رقم الهاتف" onkeyup="searchTeachers()" style="width:70%; display:inline-block;">
+    <button class="small-button gray" onclick="displayTeachers()">عرض الكل</button>
+  </div>
+
+  <div id="teachersList"></div>
+
+  
+  <input type="file" id="teacherFileInput" accept=".txt" style="display:none" onchange="importTeacherFile(event)">
+</div>
+
+<!-- قسم الطلاب -->
+<div id="students" class="section">
+  <h3>إدارة الطلاب</h3>
+
+  <div style="text-align:left; margin-bottom:8px;">
+    <button class="small-button" onclick="createNewStudent()">➕ إضافة طالب جديد</button>
+    <button class="small-button gray" onclick="downloadAllStudents()"> حفظ كل الطلاب كملف</button>
+    <button class="small-button" onclick="triggerStudentImport()">استرجاع طالب من ملف</button>
+    <button class="small-button" onclick="clearAllStudents()" style="background:#d32f2f;">🗑 مسح جميع الطلاب</button>
+  </div>
+
+  <div style="background:#dff6f1; padding:10px; border-radius:8px;">
+    <div style="text-align:right;">
+      <label>اسم الطالب الثلاثي </label>
+      <input type="text" id="s_name" placeholder="اسم الطالب الثلاثي">
+
+      <label>اسم الأب الثلاثي</label>
+      <input type="text" id="s_father" placeholder="اسم الأب الثلاثي">
+
+      <div class="row">
+        <div class="small">
+          <label>رقم هاتف  ولي الأمر</label>
+          <input type="text" id="s_parent_phone" placeholder="رقم ولي الأمر">
+        </div>
+        <div class="small">
+          <label>عمر الطالب</label>
+          <input type="number" id="s_age" placeholder="عمر الطالب">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="small">
+          <label>مواليد الطالب</label>
+          <input type="text" id="s_birthdate" placeholder="مواليد الطالب مثال 2000/1/1">
+        </div>
+        <div class="small">
+          <label>المرحلة الدراسية للطالب</label>
+          <input type="text" id="s_stage" placeholder="المرحلة الدراسية للطالب">
+        </div>
+      </div>
+
+      <label>عنوان منزل الطالب</label>
+      <input type="text" id="s_address" placeholder="عنوان منزل الطالب">
+
+      <label>السنوات التي رسبها في المدرسة الحالية</label>
+      <input type="number" id="s_failed_years" placeholder="اكتب عدد السنوات رقما">
+
+      <label>ارفع صورة شخصية للطالب</label>
+      <input type="file" id="s_photo" accept="image/*" onchange="previewStudentPhoto(event)">
+      <img id="studentPhotoPreview" src="" alt="" style="display:none;">
+
+      <hr style="border:0.5px solid #cfded9;">
+
+      <!-- درجات الطالب -->
+      <h4>درجات الطالب</h4>
+      <div id="gradesContainer"></div>
+      <div class="row" style="align-items:center;">
+        <input type="text" id="grade_subject" placeholder="اسم المادة" class="small">
+        <input type="number" id="grade_value" placeholder="الدرجة" class="small">
+      </div>
+      <div style="text-align:left;">
+        <button class="small-button" onclick="addGrade()">➕ إضافة درجة</button>
+        <button class="small-button gray" onclick="clearGrades()"> مسح الدرجات</button>
+      </div>
+
+      <div style="text-align:left; margin-top:10px;">
+        <button class="small-button" onclick="saveStudent()"> حفظ الطالب</button>
+        <button class="small-button gray" onclick="clearStudentForm()"> مسح الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="studentSearch" placeholder="البحث عن طالب"onkeyup="searchStudents()" style="width:70%; display:inline-block;">
+    <button class="small-button gray" onclick="displayStudents()">عرض الكل</button>
+  </div>
+
+  <div id="studentsList"></div>
+
+
+  <input type="file" id="studentFileInput" accept=".txt" style="display:none" onchange="importStudentFile(event)">
+</div>
+
+
+<div id="management" class="section">
+  <h3>قائمة الإدارة</h3>
+  <p>يمكن إضافة عناصر الإدارة لاحقاً هنا.</p>
+</div>
+
+<div id="schoolRecords" class="section">
+  <h3>سجل بيانات المدرسة</h3>
+  <p>مكان مخصص لسجل المدرسة وملفاتها.</p>
+</div>
+
+<script>
+/* ============================
+   بيانات المدرسين والطلاب (في الذاكرة)
+   ============================ */
+let teachers = [];
+let tEditIndex = null;
+
+let students = [];
+let sEditIndex = null;
+
+/* ============================
+   دالات الحفظ والتحميل من LocalStorage
+   ============================ */
+function saveTeachersToStorage() {
+  localStorage.setItem('school_teachers', JSON.stringify(teachers));
+}
+
+function loadTeachersFromStorage() {
+  const stored = localStorage.getItem('school_teachers');
+  if (stored) {
+    teachers = JSON.parse(stored);
+  }
+}
+
+function saveStudentsToStorage() {
+  localStorage.setItem('school_students', JSON.stringify(students));
+}
+
+function loadStudentsFromStorage() {
+  const stored = localStorage.getItem('school_students');
+  if (stored) {
+    students = JSON.parse(stored);
+  }
+}
+
+/* ============================
+   تنقل بين الأقسام
+   ============================ */
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+/* عند بدء التشغيل نعرض المدرسين */
+showSection('teachers');
+
+/* ============================
+   مساعدة: تنسيق الراتب (أثناء الكتابة)
+   ============================ */
+function formatSalaryInput(el){
+  // تبقي الأرقام فقط، ثم تضيف الفواصل
+  let raw = el.value.replace(/[^\d]/g,'');
+  if(raw === "") { el.value = ""; return; }
+  let withCommas = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  el.value = withCommas;
+}
+
+/* لإظهار قيمة الراتب مع "دينار عراقي" عند العرض */
+function formatSalaryForDisplay(rawNumberString){
+  if(!rawNumberString) return "";
+  let num = String(rawNumberString).replace(/[^\d]/g,'');
+  if(num==="") return "";
+  let withCommas = num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return withCommas + " دينار عراقي";
+}
+
+/* ============================
+   أقسام المدرسين
+   ============================ */
+function createNewTeacher(){
+  clearTeacherForm();
+  tEditIndex = null;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function addTeacherStage(){
+  let val = document.getElementById('t_stage_input').value.trim();
+  if(!val) return;
+  const list = document.getElementById('t_stages_list');
+  // create tag
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerText = val + ' ✖';
+  tag.onclick = () => { tag.remove(); };
+  list.appendChild(tag);
+  document.getElementById('t_stage_input').value = '';
+}
+
+function getTeacherStagesArray(){
+  const container = document.getElementById('t_stages_list');
+  let arr = [];
+  container.querySelectorAll('.tag').forEach(t => {
+    arr.push(t.innerText.replace(' ✖',''));
+  });
+  return arr;
+}
+
+function setTeacherStagesFromArray(arr){
+  const container = document.getElementById('t_stages_list');
+  container.innerHTML = '';
+  arr.forEach(v => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerText = v + ' ✖';
+    tag.onclick = () => { tag.remove(); };
+    container.appendChild(tag);
+  });
+}
+
+function clearTeacherForm(){
+  document.getElementById('t_name').value = '';
+  document.getElementById('t_phone').value = '';
+  document.getElementById('t_address').value = '';
+  document.getElementById('t_gender').value = '';
+  document.getElementById('t_age').value = '';
+  document.getElementById('t_subject').value = '';
+  document.getElementById('t_salary').value = '';
+  document.getElementById('t_bio').value = '';
+  document.getElementById('t_stage_input').value = '';
+  document.getElementById('t_stages_list').innerHTML = '';
+}
+
+function saveTeacher(){
+  // validation: name + phone + gender required
+  const name = document.getElementById('t_name').value.trim();
+  const phone = document.getElementById('t_phone').value.trim();
+  const gender = document.getElementById('t_gender').value;
+  if(!name){ alert('⚠ رجاءً أدخل اسم المدرس'); return; }
+  if(!phone){ alert('⚠ رجاءً أدخل رقم الهاتف'); return; }
+  if(!gender){ alert('⚠ الرجاء اختيار الجنس (ذكر/أنثى)'); return; }
+
+  const t = {
+    name,
+    phone,
+    address: document.getElementById('t_address').value.trim(),
+    gender,
+    age: document.getElementById('t_age').value,
+    subject: document.getElementById('t_subject').value.trim(),
+    stages: getTeacherStagesArray(),
+    salary: document.getElementById('t_salary').value.replace(/[^\d]/g,''),
+    bio: document.getElementById('t_bio').value.trim()
+  };
+
+  if(tEditIndex !== null){
+    // تعديل
+    teachers[tEditIndex] = t;
+    alert('✅ تم تعديل بيانات المدرس');
+    tEditIndex = null;
+  } else {
+    // إضافة جديدة - نحفظ الملف بصيغة txt كما طلبت
+    teachers.push(t);
+    saveTeacherTxtFile(t);
+    alert('✅ تم حفظ بيانات المدرس وتحميله كملف TXT');
+  }
+
+  // حفظ البيانات في التخزين المحلي
+  saveTeachersToStorage();
+  
+  displayTeachers();
+  clearTeacherForm();
+}
+
+/* حفظ مدرس بصيغة TXT */
+function saveTeacherTxtFile(t){
+  let data = `اسم المدرس الثلاثي: ${t.name}\n` +
+             `رقم الهاتف: ${t.phone}\n` +
+             `عنوان المدرس: ${t.address}\n` +
+             `الجنس: ${t.gender}\n` +
+             `عمر المدرس: ${t.age}\n` +
+             `المادة التي يدرسها: ${t.subject}\n` +
+             `المراحل التي يدرسها: ${t.stages.join(' ، ')}\n` +
+             `الراتب الشهري: ${formatSalaryForDisplay(t.salary)}\n` +
+             `النبذة: ${t.bio}\n`;
+  let blob = new Blob([data], {type:'text/plain'});
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  // اسم الملف يحتوي الاسم
+  link.download = `مدرس_${t.name || 'بدون_اسم'}.txt`;
+  link.click();
+}
+
+/* عرض المدرسين */
+function displayTeachers(list = teachers){
+  const div = document.getElementById('teachersList');
+  div.innerHTML = '';
+  if(list.length === 0){ div.innerHTML = '<p style="color:#666">لا يوجد مدرسين مسجلين حالياً.</p>'; return; }
+  list.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let salaryDisplay = t.salary ? formatSalaryForDisplay(t.salary) : '';
+    card.innerHTML = `
+      <b>${t.name || '-'}</b><br>
+      هاتف: ${t.phone || '-'}<br>
+      العنوان: ${t.address || '-'}<br>
+      الجنس: ${t.gender || '-'} &nbsp; | &nbsp; العمر: ${t.age || '-'}<br>
+      المادة: ${t.subject || '-'}<br>
+      المراحل: ${ (t.stages && t.stages.length) ? t.stages.join(' ، ') : '-'}<br>
+      الراتب: ${salaryDisplay}<br>
+      النبذة: ${t.bio || '-'}<br>
+      <div style="margin-top:6px; text-align:left;">
+        <button class="small-button" onclick="editTeacher(${i})">✏ تعديل</button>
+        <button class="small-button gray" onclick="deleteTeacher(${i})">🗑 حذف</button>
+        <button class="small-button" onclick="downloadSingleTeacher(${i})">⬇ تنزيل TXT</button>
+      </div>
+    `;
+    div.appendChild(card);
+  });
+}
+
+/* تعديل مدرس */
+function editTeacher(i){
+  const t = teachers[i];
+  document.getElementById('t_name').value = t.name || '';
+  document.getElementById('t_phone').value = t.phone || '';
+  document.getElementById('t_address').value = t.address || '';
+  document.getElementById('t_gender').value = t.gender || '';
+  document.getElementById('t_age').value = t.age || '';
+  document.getElementById('t_subject').value = t.subject || '';
+  document.getElementById('t_salary').value = t.salary ? t.salary.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
+  document.getElementById('t_bio').value = t.bio || '';
+  setTeacherStagesFromArray(t.stages || []);
+  tEditIndex = i;
+  window.scrollTo({top:0, behavior:'smooth'});
+  alert('✏ الآن يمكنك تعديل البيانات ثم ضغط حفظ');
+}
+
+/* حذف */
+function deleteTeacher(i){
+  if(!confirm('هل تريد حذف هذا المدرس؟')) return;
+  teachers.splice(i,1);
+  // حفظ التغييرات في التخزين المحلي
+  saveTeachersToStorage();
+  displayTeachers();
+}
+
+/* مسح جميع المدرسين */
+function clearAllTeachers(){
+  if(!confirm('هل أنت متأكد من مسح جميع بيانات المدرسين؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+  teachers = [];
+  saveTeachersToStorage();
+  displayTeachers();
+  alert('تم مسح جميع بيانات المدرسين');
+}
+
+/* تنزيل مدرس مفرد بصيغة TXT (من القائمة) */
+function downloadSingleTeacher(i){
+  saveTeacherTxtFile(teachers[i]);
+}
+
+/* البحث */
+function searchTeachers(){
+  const q = document.getElementById('teacherSearch').value.trim().toLowerCase();
+  if(!q){ displayTeachers(); return; }
+  const filtered = teachers.filter(t => 
+    (t.name && t.name.toLowerCase().includes(q)) || (t.phone && t.phone.includes(q))
+  );
+  displayTeachers(filtered);
+}
+
+/* تنزيل جميع المدرسين في ملف واحد */
+function downloadAllTeachers(){
+  if(teachers.length === 0){ alert('لا يوجد مدرسين للحفظ'); return; }
+  let all = '';
+  teachers.forEach((t, idx) => {
+    all += `--- المدرس رقم ${idx+1} ---\n`;
+    all += `اسم: ${t.name}\n`;
+    all += `هاتف: ${t.phone}\n`;
+    all += `العنوان: ${t.address}\n`;
+    all += `الجنس: ${t.gender}\n`;
+    all += `العمر: ${t.age}\n`;
+    all += `المادة: ${t.subject}\n`;
+    all += `المراحل: ${t.stages.join(' ، ')}\n`;
+    all += `الراتب: ${formatSalaryForDisplay(t.salary)}\n`;
+    all += `النبذة: ${t.bio}\n\n`;
+  });
+  let blob = new Blob([all], {type:'text/plain'});
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'جميع_المدرسين.txt';
+  link.click();
+}
+
+/* استرجاع (استيراد) مدرس من ملف TXT */
+function triggerTeacherImport(){
+  document.getElementById('teacherFileInput').click();
+}
+function importTeacherFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const lines = ev.target.result.split('\n');
+    const t = {
+      name: (lines[0]||'').replace('اسم المدرس الثلاثي: ','').trim(),
+      phone: (lines[1]||'').replace('رقم الهاتف: ','').trim(),
+      address: (lines[2]||'').replace('عنوان المدرس: ','').trim(),
+      gender: (lines[3]||'').replace('الجنس: ','').trim(),
+      age: (lines[4]||'').replace('عمر المدرس: ','').trim(),
+      subject: (lines[5]||'').replace('المادة التي يدرسها: ','').trim(),
+      stages: ((lines[6]||'').replace('المراحل التي يدرسها: ','').trim().split(' ، ').filter(x=>x)),
+      salary: (lines[7]||'').replace('الراتب الشهري: ','').replace(/[^\d]/g,'').trim(),
+      bio: (lines[8]||'').replace('النبذة: ','').trim()
+    };
+    teachers.push(t);
+    // حفظ البيانات في التخزين المحلي
+    saveTeachersToStorage();
+    alert('📥 تم استيراد بيانات المدرس');
+    displayTeachers();
+  };
+  reader.readAsText(file);
+}
+
+/* ============================
+   أقسام الطلاب
+   ============================ */
+function createNewStudent(){
+  clearStudentForm();
+  sEditIndex = null;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* معاينة صورة الطالب */
+function previewStudentPhoto(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = document.getElementById('studentPhotoPreview');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    img.dataset.url = ev.target.result; // نخزن dataURL
+  };
+  reader.readAsDataURL(file);
+}
+
+/* درجات */
+function addGrade(){
+  const subj = document.getElementById('grade_subject').value.trim();
+  const val = document.getElementById('grade_value').value;
+  if(!subj){ alert('⚠ أدخل اسم المادة'); return; }
+  if(val === ''){ alert('⚠ أدخل الدرجة'); return; }
+  const container = document.getElementById('gradesContainer');
+  const row = document.createElement('div');
+  row.className = 'grade-row';
+  row.innerHTML = `<div style="flex:1"><b>${subj}</b></div><div style="width:100px">${val}</div><div style="width:120px; text-align:left;"><button class="small-button gray" onclick="this.parentElement.parentElement.remove()">حذف</button></div>`;
+  // نخزن البيانات كـ data attributes
+  row.dataset.subj = subj;
+  row.dataset.val = val;
+  container.appendChild(row);
+  document.getElementById('grade_subject').value = '';
+  document.getElementById('grade_value').value = '';
+}
+
+function clearGrades(){
+  document.getElementById('gradesContainer').innerHTML = '';
+}
+
+function getGradesArray(){
+  const out = [];
+  document.querySelectorAll('#gradesContainer .grade-row').forEach(r => {
+    out.push({subject: r.dataset.subj, grade: r.dataset.val});
+  });
+  return out;
+}
+
+function setGradesFromArray(arr){
+  clearGrades();
+  arr.forEach(g => {
+    const container = document.getElementById('gradesContainer');
+    const row = document.createElement('div');
+    row.className = 'grade-row';
+    row.dataset.subj = g.subject;
+    row.dataset.val = g.grade;
+    row.innerHTML = `<div style="flex:1"><b>${g.subject}</b></div><div style="width:100px">${g.grade}</div><div style="width:120px; text-align:left;"><button class="small-button gray" onclick="this.parentElement.parentElement.remove()">حذف</button></div>`;
+    container.appendChild(row);
+  });
+}
+
+/* حفظ طالب */
+function saveStudent(){
+  const name = document.getElementById('s_name').value.trim();
+  if(!name){ alert('⚠ أدخل اسم الطالب'); return; }
+  const s = {
+    name,
+    father: document.getElementById('s_father').value.trim(),
+    parent_phone: document.getElementById('s_parent_phone').value.trim(),
+    age: document.getElementById('s_age').value,
+    birthdate: document.getElementById('s_birthdate').value.trim(),
+    stage: document.getElementById('s_stage').value.trim(),
+    address: document.getElementById('s_address').value.trim(),
+    failed_years: document.getElementById('s_failed_years').value,
+    photoDataUrl: document.getElementById('studentPhotoPreview').dataset.url || '',
+    grades: getGradesArray()
+  };
+
+  if(sEditIndex !== null){
+    students[sEditIndex] = s;
+    sEditIndex = null;
+    alert('✅ تم تعديل بيانات الطالب');
+  } else {
+    students.push(s);
+    saveStudentTxtFile(s);
+    alert('✅ تم حفظ بيانات الطالب وتحميله كملف TXT');
+  }
+  
+  // حفظ البيانات في التخزين المحلي
+  saveStudentsToStorage();
+  
+  displayStudents();
+  clearStudentForm();
+}
+
+/* حفظ طالب كملف txt */
+function saveStudentTxtFile(s){
+  let data = `اسم الطالب الثلاثي: ${s.name}\n` +
+             `اسم الاب الثلاثي: ${s.father}\n` +
+             `رقم ولي الامر: ${s.parent_phone}\n` +
+             `عمر الطالب: ${s.age}\n` +
+             `مواليد الطالب: ${s.birthdate}\n` +
+             `المرحلة الدراسية: ${s.stage}\n` +
+             `عنوان المنزل: ${s.address}\n` +
+             `سنوات رسبها: ${s.failed_years}\n` +
+             `الدرجات:\n`;
+  s.grades.forEach(g => {
+    data += `- ${g.subject} : ${g.grade}\n`;
+  });
+  data += `صورة: (غير مشمولة بالملف txt)\n`;
+  let blob = new Blob([data], {type:'text/plain'});
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `طالب_${s.name || 'بدون_اسم'}.txt`;
+  link.click();
+}
+
+/* عرض الطلاب */
+function displayStudents(list = students){
+  const div = document.getElementById('studentsList');
+  div.innerHTML = '';
+  if(list.length === 0){ div.innerHTML = '<p style="color:#666">لا يوجد طلاب مسجلين حالياً.</p>'; return; }
+  list.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let gradesHtml = (s.grades && s.grades.length) ? s.grades.map(g => `${g.subject}: ${g.grade}`).join(' | ') : '-';
+    let imgHtml = s.photoDataUrl ? `<img src="${s.photoDataUrl}" style="max-width:80px; display:block; margin:6px 0; border-radius:6px;">` : '';
+    card.innerHTML = `
+      <b>${s.name || '-'}</b><br>
+      الأب: ${s.father || '-'}<br>
+      ولي الأمر: ${s.parent_phone || '-'}<br>
+      العمر: ${s.age || '-'} &nbsp; | &nbsp; مواليد: ${s.birthdate || '-'}<br>
+      المرحلة: ${s.stage || '-'} &nbsp; | &nbsp; سنوات الرسوب: ${s.failed_years || 0}<br>
+      العنوان: ${s.address || '-'}<br>
+      الدرجات: ${gradesHtml}<br>
+      ${imgHtml}
+      <div style="margin-top:6px; text-align:left;">
+        <button class="small-button" onclick="editStudent(${i})">✏ تعديل</button>
+        <button class="small-button gray" onclick="deleteStudent(${i})">🗑 حذف</button>
+        <button class="small-button" onclick="downloadSingleStudent(${i})">⬇ تنزيل TXT</button>
+      </div>
+    `;
+    div.appendChild(card);
+  });
+}
+
+/* تعديل طالب */
+function editStudent(i){
+  const s = students[i];
+  document.getElementById('s_name').value = s.name || '';
+  document.getElementById('s_father').value = s.father || '';
+  document.getElementById('s_parent_phone').value = s.parent_phone || '';
+  document.getElementById('s_age').value = s.age || '';
+  document.getElementById('s_birthdate').value = s.birthdate || '';
+  document.getElementById('s_stage').value = s.stage || '';
+  document.getElementById('s_address').value = s.address || '';
+  document.getElementById('s_failed_years').value = s.failed_years || '';
+  if(s.photoDataUrl){
+    document.getElementById('studentPhotoPreview').src = s.photoDataUrl;
+    document.getElementById('studentPhotoPreview').style.display = 'block';
+    document.getElementById('studentPhotoPreview').dataset.url = s.photoDataUrl;
+  } else {
+    document.getElementById('studentPhotoPreview').src = '';
+    document.getElementById('studentPhotoPreview').style.display = 'none';
+    delete document.getElementById('studentPhotoPreview').dataset.url;
+  }
+  setGradesFromArray(s.grades || []);
+  sEditIndex = i;
+  window.scrollTo({top:0, behavior:'smooth'});
+  alert('✏ الآن يمكنك تعديل بيانات الطالب ثم ضغط حفظ');
+}
+
+function deleteStudent(i){
+  if(!confirm('هل تريد حذف هذا الطالب؟')) return;
+  students.splice(i,1);
+  // حفظ التغييرات في التخزين المحلي
+  saveStudentsToStorage();
+  displayStudents();
+}
+
+/* مسح جميع الطلاب */
+function clearAllStudents(){
+  if(!confirm('هل أنت متأكد من مسح جميع بيانات الطلاب؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+  students = [];
+  saveStudentsToStorage();
+  displayStudents();
+  alert('تم مسح جميع بيانات الطلاب');
+}
+
+function downloadSingleStudent(i){
+  saveStudentTxtFile(students[i]);
+}
+
+/* بحث طلاب */
+function searchStudents(){
+  const q = document.getElementById('studentSearch').value.trim().toLowerCase();
+  if(!q){ displayStudents(); return; }
+  const filtered = students.filter(s => 
+    (s.name && s.name.toLowerCase().includes(q)) || (s.parent_phone && s.parent_phone.includes(q))
+  );
+  displayStudents(filtered);
+}
+
+/* تنزيل كل الطلاب */
+function downloadAllStudents(){
+  if(students.length === 0){ alert('لا يوجد طلاب للحفظ'); return; }
+  let all = '';
+  students.forEach((s, idx) => {
+    all += `--- الطالب رقم ${idx+1} ---\n`;
+    all += `اسم: ${s.name}\n`;
+    all += `الأب: ${s.father}\n`;
+    all += `ولي الأمر: ${s.parent_phone}\n`;
+    all += `العمر: ${s.age}\n`;
+    all += `مواليد: ${s.birthdate}\n`;
+    all += `المرحلة: ${s.stage}\n`;
+    all += `سنوات الرسوب: ${s.failed_years}\n`;
+    all += `الدرجات:\n`;
+    s.grades.forEach(g => all += `- ${g.subject}: ${g.grade}\n`);
+    all += `\n`;
+  });
+  let blob = new Blob([all], {type:'text/plain'});
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'جميع_الطلاب.txt';
+  link.click();
+}
+
+/* استيراد طالب */
+function triggerStudentImport(){ document.getElementById('studentFileInput').click(); }
+function importStudentFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const text = ev.target.result;
+    const lines = text.split('\n');
+    const s = {
+      name: (lines[0]||'').replace('اسم الطالب الثلاثي: ','').trim(),
+      father: (lines[1]||'').replace('اسم الاب الثلاثي: ','').trim(),
+      parent_phone: (lines[2]||'').replace('رقم ولي الامر: ','').trim(),
+      age: (lines[3]||'').replace('عمر الطالب: ','').trim(),
+      birthdate: (lines[4]||'').replace('مواليد الطالب: ','').trim(),
+      stage: (lines[5]||'').replace('المرحلة الدراسية: ','').trim(),
+      address: (lines[6]||'').replace('عنوان المنزل: ','').trim(),
+      failed_years: (lines[7]||'').replace('سنوات رسبها: ','').trim(),
+      grades: []
+    };
+    // parsing grades section
+    const idx = lines.findIndex(l => l.startsWith('الدرجات:'));
+    if(idx >= 0){
+      for(let i = idx+1; i < lines.length; i++){
+        const ln = lines[i].trim();
+        if(!ln) continue;
+        const m = ln.replace(/^- /,'').split(':');
+        if(m.length >= 2) s.grades.push({subject: m[0].trim(), grade: m[1].trim()});
+      }
+    }
+    students.push(s);
+    // حفظ البيانات في التخزين المحلي
+    saveStudentsToStorage();
+    alert('📥 تم استيراد بيانات الطالب');
+    displayStudents();
+  };
+  reader.readAsText(file);
+}
+
+/* تنظيف فورم الطالب */
+function clearStudentForm(){
+  document.getElementById('s_name').value = '';
+  document.getElementById('s_father').value = '';
+  document.getElementById('s_parent_phone').value = '';
+  document.getElementById('s_age').value = '';
+  document.getElementById('s_birthdate').value = '';
+  document.getElementById('s_stage').value = '';
+  document.getElementById('s_address').value = '';
+  document.getElementById('s_failed_years').value = '';
+  document.getElementById('s_photo').value = '';
+  document.getElementById('studentPhotoPreview').src = '';
+  document.getElementById('studentPhotoPreview').style.display = 'none';
+  delete document.getElementById('studentPhotoPreview').dataset.url;
+  clearGrades();
+}
+
+/* ============================
+   تهيئة التطبيق عند التحميل
+   ============================ */
+window.onload = function() {
+  // تحميل البيانات من التخزين المحلي
+  loadTeachersFromStorage();
+  loadStudentsFromStorage();
+  
+  // عرض البيانات المحفوظة
+  displayTeachers();
+  displayStudents();
+  
+  // إظهار قسم المدرسين افتراضياً
+  showSection('teachers');
+};
+</script>
+
+</body>
+</html>
